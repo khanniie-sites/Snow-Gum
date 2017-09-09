@@ -95,8 +95,8 @@
     clouds.y = 0;
     grass.x = 0; 
     grass.y = 0; 
-    stage.addChild(clouds); 
-    stage.addChild(grass); 
+    //stage.addChild(clouds); 
+    //stage.addChild(grass); 
     //creating the main character
     loadCharacter();
     stage.update();
@@ -196,7 +196,7 @@
         annyang.abort();
         annyang.start();
         speed++;
-        stage.addChild(monsters[0].sprite);
+        //stage.addChild(monsters[0].sprite);
         stage.setChildIndex( maincharacter, stage.getNumChildren()-1);
         stage.update();
     }
@@ -229,7 +229,7 @@
             $("#name").html(friends[friends.length-1].color + ", correct!");
             if(friends.length == 10)
                 $("#name").html("You Won!");
-            stage.addChild(friends[friends.length - 1].sprite);
+            //stage.addChild(friends[friends.length - 1].sprite);
             stage.update();
         }
         nextmonster();
