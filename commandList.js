@@ -30,6 +30,9 @@ var green = {
 var orange = {
     'naranja': function() {
         $('#name').html("That's right! Naranja!");
+    },
+    'naranjo': function() {
+        $('#name').html("That's right! Naranjo!");
     }
 };
 var pink = {
