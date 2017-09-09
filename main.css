@@ -1,0 +1,17 @@
+body{
+    font-family: 'Life Savers', cursive;
+}
+#centered{
+    margin: auto; 
+    display: block; 
+    width: 100%;
+    text-align: center; 
+}
+
+#name{
+    position: fixed;
+    top: 30%;
+    left: 45%;
+    font-size: 40px; 
+    color: white; 
+}
