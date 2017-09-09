@@ -12,7 +12,6 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
     <script src="commandList.js"></script>
-    <script src="https://code.createjs.com/tweenjs-0.6.2.min.js"></script>
     <script src="https://code.createjs.com/easeljs-0.8.2.min.js"></script>
     <script src="speakClient.js"></script>
 </head>
@@ -95,8 +94,8 @@
     clouds.y = 0;
     grass.x = 0; 
     grass.y = 0; 
-    //stage.addChild(clouds); 
-    //stage.addChild(grass); 
+    stage.addChild(clouds); 
+    stage.addChild(grass); 
     //creating the main character
     loadCharacter();
     stage.update();
@@ -196,7 +195,7 @@
         annyang.abort();
         annyang.start();
         speed++;
-        //stage.addChild(monsters[0].sprite);
+        stage.addChild(monsters[0].sprite);
         stage.setChildIndex( maincharacter, stage.getNumChildren()-1);
         stage.update();
     }
@@ -229,7 +228,7 @@
             $("#name").html(friends[friends.length-1].color + ", correct!");
             if(friends.length == 10)
                 $("#name").html("You Won!");
-            //stage.addChild(friends[friends.length - 1].sprite);
+            stage.addChild(friends[friends.length - 1].sprite);
             stage.update();
         }
         nextmonster();
