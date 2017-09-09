@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="es-US">
+
+<head>
+    <meta charset="utf-8">
+    <title>:::::::::::^) </title>
+    <meta name="description" content="The HTML5 Herald">
+    <meta name="author" content="SitePoint">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
+    <!--    <script src="canvasscript.js"></script>-->
+    <script src="commandList.js"></script>
+    <script src="https://code.createjs.com/easeljs-0.8.2.min.js"></script>
+    <script src="speakClient.js"></script>-->
+</head>
+
+<body onload="init();">
+    <canvas id="demoCanvas" width="1100" height="700" style="border: 1px solid black; "></canvas>
+    hello!!!
+    <button type="button" onclick="defeatmonster()">defeat monster</button>
+    <script src="hackcmu.js"></script>
+    <div id="name"></div>
+    <button id="talk">Talk</button>
+    <div id="audio"></div>
+    <button id="switch">SWITCH</button>
+    <script>
+    init();
+    var nextmonster = true;
+    if (annyang) {
+        // Let's define our first command. First the text we expect, and then the function it should call
+        annyang.start();
+        var colors = ["pink", "orange", "yellow", "green", "blue", "white", "black"];
+        var array1 = [pink, orange, yellow, green, blue, white, black];
+        var voices = [{ amplitude: 200, wordgap: 1, pitch: 1000, speed: 175 }, { amplitude: 200, wordgap: 2, pitch: 40, speed: 200 }, { amplitude: 200, wordgap: 2, pitch: 500, speed: 100 }, { amplitude: 200, wordgap: 4, pitch: 100, speed: 75 }, { amplitude: 50, wordgap: 3, pitch: 350, speed: 250 }, { amplitude: 200, wordgap: 2, pitch: 15, speed: 125 }, { amplitude: 200, wordgap: 2, pitch: 650, speed: 250 }];
+        // Add our commands to annyang
+
+        $("#talk").click(function() {
+            console.log("hi");
+            var x = 0;
+            while (x < voices.length) {
+                console.log(voices[x].name);
+                x++;
+            }
+        });
+        annyang.addCallback('resultMatch', function(userSaid, commandText, phrases) {
+            console.log(userSaid); // sample output: 'hello'
+            console.log(commandText); // sample output: 'hello (there)'
+            console.log(phrases); // sample output: ['hello', 'halo', 'yellow', 'polo', 'hello kitty']
+            defeatmonster();
+            $("#name").html("Defeated!");
+            annyang.start();
+            nextmonster = true;
+        });
+
+        annyang.addCallback('resultNoMatch', function(phrases) {
+            console.log("I think the user said: ", phrases[0]);
+            console.log("But then again, it could be any of the following: ", phrases);
+            annyang.abort();
+            annyang.start();
+        });
+
+        // Start listening. You can call this here, or attach this call to an event, button, etc.
+        annyang.start();
+
+        annyang.addCallback('soundstart', function() {
+            console.log('sound detected');
+        });
+
+        annyang.addCallback('result', function() {
+            console.log('sound stopped');
+            annyang.start();
+        });
+    }
+    //var stage;
+    var ticks;
+    var monsters; //array with all the monsters. each monster has color string, "defeated" boolean, x coordinate int 
+    var speed = 5; //pixel per second movement of monsters
+    //var colors = ["pink", "orange", "yellow", "green", "blue", "white", "black"]
+    var collected = 0; //number of monsters defeated so far 
+    //initiation functions
+    function init() {
+        stage = new createjs.Stage("demoCanvas");
+        monsters = [];
+        //creating the main character
+        loadCharacter();
+        stage.update();
+    }
+
+    //main koala character
+    function loadCharacter() {
+        var data = {
+            images: ["spritesheet.png"],
+            frames: { width: 225, height: 400 },
+            animations: {
+                run: {
+                    frames: [0, 1, 2, 3, 4, 5, 6, 7]
+                }
+            }
+        };
+        var spriteSheet = new createjs.SpriteSheet(data);
+        var animation = new createjs.Sprite(spriteSheet);
+        animation.x = 100;
+        animation.gotoAndPlay("run");
+        animation.y = 300;
+        animation.currentFrame = 0;
+        stage.addChild(animation);
+        console.log("before or after");
+    }
+
+    createjs.Ticker.addEventListener("tick", handleTick);
+    createjs.Ticker.setFPS(8);
+
+    function handleTick(event) {
+        // Actions carried out each tick (aka frame)
+        ticks += 1;
+        for (i = 0; i < monsters.length; i++) {
+            if (!monsters[i].defeated) {
+                if (monsters[i].x <= 200 && !monsters[i].defeated) {
+                    monsterwarning(i);
+                    nextmonster = true;
+                }
+                monsters[i].x -= speed;
+
+                monsters[i].sprite.x = monsters[i].x
+                stage.addChild(monsters[i].sprite);
+            }
+        }
+        stage.update();
+        if (!event.paused) {
+            // Actions carried out when the Ticker is not paused.
+        }
+    }
+    //called when monsters reach a certain point 
+    function monsterwarning(i) {
+        monsters[i].defeated = true;
+        monsters[i].color = "#FF0000";
+        console.log("lost a life");
+        monsters[i].sprite.gotoAndPlay("still");
+        annyang.abort();
+        //        annyang.start();
+    }
+
+    function newmonster(index) {
+        var data = {
+            images: [colors[index] + "spritesheet.png"],
+            frames: { width: 400, height: 400 },
+            animations: {
+                run: [0, 7],
+                still: [8]
+            }
+        };
+        var monster = { color: colors[index], x: 1000, defeated: false, sprite: null }
+        var spriteSheet = new createjs.SpriteSheet(data);
+        monster.sprite = new createjs.Sprite(spriteSheet);
+        monster.sprite.gotoAndPlay("run");
+        monster.sprite.x = monster.x;
+        monster.sprite.currentFrame = ticks % 8;
+        monster.sprite.scaleX = .75;
+        monster.sprite.scaleY = .75;
+        monster.sprite.y = 300;
+        stage.addChild(monster.sprite);
+        stage.update();
+        monsters.push(monster);
+    }
+
+    function getRandomColor() {
+        return colors[Math.floor(Math.random() * 8)];
+    }
+
+    function defeatmonster() {
+        var i = 0;
+        while (i < monsters.length && monsters[i].defeated) {
+            console.log(monsters[i]);
+            i++;
+        }
+        if (i < monsters.length) {
+            monsters[i].defeated = true;
+            if (collected >= 10) {
+                //shifts top collection bar left if it gets full 
+                var j = 0;
+                while (j < monsters.length && monsters[j].defeated) {
+                    monsters[j].sprite.x -= 100;
+                    j++;
+                }
+                monsters[i].sprite.x = 900
+            } else
+                monsters[i].sprite.x = 100 * collected;
+            monsters[i].sprite.scaleX = .25;
+            monsters[i].sprite.scaleY = .25;
+            collected += 1;
+            monsters[i].sprite.y = 0;
+            stage.addChild(monsters[i].sprite);
+            stage.update();
+            annyang.abort();
+
+        }
+    }
+    annyang.addCommands(commands);
+    //$("#switch").click(function(){
+    //     console.log("ive been clicked");
+    number_of_rounds = 0;
+    while (nextmonster == true) {
+        nextmonster = false;
+        annyang.removeCommands();
+        var temp = Math.floor(Math.random() * (array1.length));
+        console.log(array1[temp]);
+        newmonster(temp);
+        annyang.abort();
+        annyang.addCommands(array1[temp]);
+        speak('What color am I?', voices[temp]);
+        //        var msg = new SpeechSynthesisUtterance();
+        //          var voices = window.speechSynthesis.getVoices();
+        //          msg.voice = voices[10]; // Note: some voices don't support altering params
+        //          msg.voiceURI = 'native';
+        //          msg.volume = 1; // 0 to 1
+        //          msg.rate = 1; // 0.1 to 10
+        //          msg.pitch = 2; //0 to 2
+        //          msg.text = 'What color am I?';
+        //          msg.lang = 'en-US';
+        //        window.speechSynthesis.speak(msg);
+        annyang.start();
+        if (number_of_rounds >= 10) {
+            nextmonster = false;
+        }
+        speed++;
+        number_of_rounds++;
+    }
+    //  });
+    </script>
+</body>
+
+</html>
