@@ -11,15 +11,16 @@
   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
   integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g="
   crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
+    <script src="canvasscript.js"></script>
+    <script src="commandList.js"></script>
+    <script src="https://code.createjs.com/easeljs-0.8.2.min.js"></script>
 
-  <script src="commandList.js"></script>
 </head>
 
 <body onload="init();">
     <canvas id="demoCanvas" width="1000" height="700" style="border: 1px solid black; "></canvas>
     hello!!! 
-    <button type="button" onclick="newmonster()">new monster</button>
     <button type="button" onclick="defeatmonster()">defeat monster</button>
     <script src="hackcmu.js"></script>
     <div id="name"></div>
@@ -28,8 +29,8 @@
       <script>
   if (annyang) {
     // Let's define our first command. First the text we expect, and then the function it should call
-    
-    var array1 = [red, blue, white, yellow, green, orange, pink];
+    annyang.start();
+    var array1 = [pink, orange, yellow, green, blue, white, black];
       
     // Add our commands to annyang
     annyang.addCommands(commands);
@@ -38,6 +39,7 @@
          annyang.removeCommands();
          var temp = Math.floor(Math.random()*(array1.length));
          console.log(array1[temp]);
+         newmonster(temp);
          annyang.addCommands(array1[temp]);
          annyang.start();
       });  
@@ -45,17 +47,120 @@
       console.log(userSaid); // sample output: 'hello'
       console.log(commandText); // sample output: 'hello (there)'
       console.log(phrases); // sample output: ['hello', 'halo', 'yellow', 'polo', 'hello kitty']
+      defeatmonster();
+      $("#name").html("Defeated!");
+        annyang.start();
     });
 
     annyang.addCallback('resultNoMatch', function(phrases) {
       console.log("I think the user said: ", phrases[0]);
       console.log("But then again, it could be any of the following: ", phrases);
+        annyang.start();
     });
 
     // Start listening. You can call this here, or attach this call to an event, button, etc.
     annyang.start();
   }
-      
+  var stage;
+    var monsters; //array with all the monsters. each monster has color string, "defeated" boolean, x coordinate int 
+    var speed = 10; //pixel per second movement of monsters
+    var colors = ["pink", "orange", "yellow", "green", "blue", "white", "black"]
+
+    //initiation functions
+    function init(){
+        stage =  new createjs.Stage("demoCanvas");
+        monsters = []; 
+        //creating the main character
+        var circle = new createjs.Shape();
+        loadCharacter(); 
+//        circle.graphics.beginFill("DeepSkyBlue").drawRect(20, 20, 100, 50);
+//        circle.x = 100;
+//        circle.y = 600;
+//        stage.addChild(circle);
+        stage.update();
+    }
+
+    //main koala character
+    function loadCharacter(){
+        var data = {
+            images: ["sprites1.png"],
+            frames: {width:50, height:50},
+            animations: {
+                stand:0,
+                run:[1,5],
+                jump:[6,8,"run"]
+            }
+        };
+        var spriteSheet = new createjs.SpriteSheet(data);
+        var animation = new createjs.Sprite(spriteSheet);
+        animation.x = 100; 
+        animation.gotoAndPlay("run");                         
+        animation.y = 600; 
+        animation.currentFrame = 0; 
+        stage.addChild(animation); 
+    }
+    
+     createjs.Ticker.addEventListener("tick", handleTick);
+     function handleTick(event) {
+         // Actions carried out each tick (aka frame)
+         for(i=0; i<monsters.length; i++){
+             if(!monsters[i].defeated){
+                if(monsters[i].x <= 200 && !monsters[i].defeated){
+                     monsterwarning(i); 
+                 }
+                 monsters[i].x -= speed; 
+
+                 monsterShape = monsters[i].shape; 
+                 monsters[i].shape.x = monsters[i].x
+                 stage.addChild(monsters[i].shape); 
+             }
+         }
+         stage.update(); 
+         if (!event.paused) {
+             // Actions carried out when the Ticker is not paused.
+         }
+    }
+    //called when monsters reach a certain point 
+    function monsterwarning(i){
+        monsters[i].defeated = true; 
+        monsters[i].color = "#FF0000"; 
+        monsters[i].command.style = monsters[i].color; 
+        console.log("lost a life"); 
+        annyang.start();
+    }
+    function newmonster(index){
+        var monster = {color:colors[index], x: 1050, defeated: false, shape: null, command: null }
+        var monsterShape = new createjs.Shape();
+        monster.command = monsterShape.graphics.beginFill(monster.color).command;
+        monsterShape.graphics.drawCircle(0, 0, 50);
+        monsterShape.x = monster.x;
+        monsterShape.y = 600;
+        monster.shape = monsterShape; 
+        stage.addChild(monsterShape);
+        stage.update();
+        monsters.push(monster); 
+    }
+
+    function getRandomColor() {
+        return colors[Math.floor(Math.random() * 8)];
+    }
+
+    //goes through list of monsters from beginning, changes color of first non-defeated one to white
+    function defeatmonster(){
+        var i = 0; 
+        while(i < monsters.length && monsters[i].defeated){
+            console.log(monsters[i]); 
+            i++; 
+        }
+        if(i < monsters.length){
+            monsters[i].defeated = true; 
+            monsters[i].color = "#DDDDDD"; 
+            monsters[i].command.style = monsters[i].color; 
+            stage.addChild(monsters[i].shape);
+            stage.update();
+
+        }
+    }   
   </script>
 </body>
 </html>

@@ -43,6 +43,11 @@ var pink = {
         $('#name').html("That's right! Rojillo!");
     }
 };
+var black = {
+    'negro': function() {
+        $('#name').html("That's right! Negro!");
+    }
+};
 //Number Commands
 var zero = {
     'cero': function() {

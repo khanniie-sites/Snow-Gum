@@ -1,4 +1,4 @@
-
+<script src="https://code.createjs.com/easeljs-0.8.2.min.js"></script>
     var stage;
     var monsters; //array with all the monsters. each monster has color string, "defeated" boolean, x coordinate int 
     var speed = 10; //pixel per second movement of monsters
