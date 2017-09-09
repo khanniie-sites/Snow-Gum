@@ -19,7 +19,7 @@
 </head>
 
 <body onload="init();">
-    <canvas id="demoCanvas" width="1000" height="700" style="border: 1px solid black; "></canvas>
+    <canvas id="demoCanvas" width="1100" height="700" style="border: 1px solid black; "></canvas>
     hello!!! 
     <button type="button" onclick="defeatmonster()">defeat monster</button>
     <script src="hackcmu.js"></script>
@@ -70,25 +70,21 @@ annyang.addCallback('result', function() {
     annyang.start();
 });
   }
-  var stage;
+    var stage;
+    var ticks; 
     var monsters; //array with all the monsters. each monster has color string, "defeated" boolean, x coordinate int 
     var speed = 5; //pixel per second movement of monsters
     var colors = ["pink", "orange", "yellow", "green", "blue", "white", "black"]
-
+    var collected = 0; //number of monsters defeated so far 
     //initiation functions
     function init(){
         stage =  new createjs.Stage("demoCanvas");
         monsters = []; 
         //creating the main character
-        var circle = new createjs.Shape();
         loadCharacter(); 
-//        circle.graphics.beginFill("DeepSkyBlue").drawRect(20, 20, 100, 50);
-//        circle.x = 100;
-//        circle.y = 600;
-//        stage.addChild(circle);
         stage.update();
     }
-
+    
     //main koala character
     function loadCharacter(){
         var data = {
@@ -112,8 +108,8 @@ annyang.addCallback('result', function() {
      createjs.Ticker.addEventListener("tick", handleTick);
      createjs.Ticker.setFPS(8);
      function handleTick(event) {
-         
          // Actions carried out each tick (aka frame)
+         ticks += 1; 
          for(i=0; i<monsters.length; i++){
              if(!monsters[i].defeated){
                 if(monsters[i].x <= 200 && !monsters[i].defeated){
@@ -121,9 +117,8 @@ annyang.addCallback('result', function() {
                  }
                  monsters[i].x -= speed; 
 
-                 monsterShape = monsters[i].shape; 
-                 monsters[i].shape.x = monsters[i].x
-                 stage.addChild(monsters[i].shape); 
+                 monsters[i].sprite.x = monsters[i].x
+                 stage.addChild(monsters[i].sprite); 
              }
          }
          stage.update(); 
@@ -135,19 +130,30 @@ annyang.addCallback('result', function() {
     function monsterwarning(i){
         monsters[i].defeated = true; 
         monsters[i].color = "#FF0000"; 
-        monsters[i].command.style = monsters[i].color; 
         console.log("lost a life"); 
+        monsters[i].sprite.gotoAndPlay("still");
+        annyang.abort();
 //        annyang.start();
     }
     function newmonster(index){
-        var monster = {color:colors[index], x: 1050, defeated: false, shape: null, command: null }
-        var monsterShape = new createjs.Shape();
-        monster.command = monsterShape.graphics.beginFill(monster.color).command;
-        monsterShape.graphics.drawCircle(0, 0, 50);
-        monsterShape.x = monster.x;
-        monsterShape.y = 600;
-        monster.shape = monsterShape; 
-        stage.addChild(monsterShape);
+         var data = {
+            images: [colors[index]+"spritesheet.png"],
+            frames: {width:400, height:400},
+            animations: {
+                run:{frames:[4,3,2,2,1,1,2,3]},
+                still:[6]
+            }
+        };
+        var monster = {color:colors[index], x: 1000, defeated: false, sprite: null }
+        var spriteSheet = new createjs.SpriteSheet(data);
+        monster.sprite = new createjs.Sprite(spriteSheet);
+        monster.sprite.gotoAndPlay("run");                         
+        monster.sprite.x = monster.x;
+        monster.sprite.currentFrame = ticks % 8; 
+        monster.sprite.scaleX = .5; 
+        monster.sprite.scaleY = .5; 
+        monster.sprite.y = 300;
+        stage.addChild(monster.sprite);
         stage.update();
         monsters.push(monster); 
     }
@@ -164,9 +170,22 @@ annyang.addCallback('result', function() {
         }
         if(i < monsters.length){
             monsters[i].defeated = true; 
-            monsters[i].color = "#DDDDDD"; 
-            monsters[i].command.style = monsters[i].color; 
-            stage.addChild(monsters[i].shape);
+            if(collected >= 10){
+                //shifts top collection bar left if it gets full 
+                var j = 0; 
+                while(j<monsters.length && monsters[j].defeated){
+                    monsters[j].sprite.x -= 100; 
+                    j++; 
+                }
+                monsters[i].sprite.x = 900
+            }
+            else
+                monsters[i].sprite.x = 100 * collected; 
+            monsters[i].sprite.scaleX = .25; 
+            monsters[i].sprite.scaleY = .25; 
+            collected += 1; 
+            monsters[i].sprite.y = 0; 
+            stage.addChild(monsters[i].sprite);
             stage.update();
             annyang.abort();
 
