@@ -135,6 +135,7 @@ annyang.addCallback('result', function() {
         monsters[i].color = "#FF0000"; 
         monsters[i].command.style = monsters[i].color; 
         console.log("lost a life"); 
+        annyang.abort();
 //        annyang.start();
     }
     function newmonster(index){
