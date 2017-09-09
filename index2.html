@@ -83,25 +83,27 @@
     //main koala character
     function loadCharacter(){
         var data = {
-            images: ["sprites1.png"],
-            frames: {width:50, height:50},
+            images: ["spritesheet.png"],
+            frames: {width:550, height:400},
             animations: {
-                stand:0,
-                run:[1,5],
-                jump:[6,8,"run"]
+                run:{
+                    frames:[0,2,1,3,4,5,6,7]
+                }
             }
         };
         var spriteSheet = new createjs.SpriteSheet(data);
         var animation = new createjs.Sprite(spriteSheet);
         animation.x = 100; 
         animation.gotoAndPlay("run");                         
-        animation.y = 600; 
+        animation.y = 300; 
         animation.currentFrame = 0; 
         stage.addChild(animation); 
     }
     
      createjs.Ticker.addEventListener("tick", handleTick);
+     createjs.Ticker.setFPS(8);
      function handleTick(event) {
+         
          // Actions carried out each tick (aka frame)
          for(i=0; i<monsters.length; i++){
              if(!monsters[i].defeated){
