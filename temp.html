@@ -22,17 +22,14 @@
     <div id="audio"></div>
     <button id="switch">SWITCH</button>
     <script>
-    init();
 
     //variables
-    var nextmonster = true;
+    // var nextmonster = true;
     var colors = ["pink", "orange", "yellow", "green", "blue", "white", "black"];
     var array1 = [pink, orange, yellow, green, blue, white, black];
     var voices = [{ amplitude: 200, wordgap: 1, pitch: 1000, speed: 175 }, { amplitude: 200, wordgap: 2, pitch: 40, speed: 200 }, { amplitude: 200, wordgap: 2, pitch: 500, speed: 100 }, { amplitude: 200, wordgap: 4, pitch: 100, speed: 75 }, { amplitude: 50, wordgap: 3, pitch: 350, speed: 250 }, { amplitude: 200, wordgap: 2, pitch: 15, speed: 125 }, { amplitude: 200, wordgap: 2, pitch: 650, speed: 250 }];
 
     if (annyang) {
-
-        annyang.start();
 
         annyang.addCallback('resultMatch', function(userSaid, commandText, phrases) {
             console.log(userSaid);
@@ -41,7 +38,6 @@
             defeatmonster();
             $("#name").html("Defeated!");
             resetAnnyang();
-            nextmonster = true;
         });
 
         annyang.addCallback('resultNoMatch', function(phrases) {
@@ -50,8 +46,6 @@
             resetAnnyang();
         });
 
-        // Start listening. You can call this here, or attach this call to an event, button, etc.
-        annyang.start();
 
         annyang.addCallback('soundstart', function() {
             console.log('sound detected');
@@ -61,9 +55,15 @@
             console.log('sound stopped');
             annyang.start();
         });
+
+        annyang.start();
     }
-    var ticks;
-    var monsters = []; //array with all the monsters. each monster has color string, "defeated" boolean, x coordinate int 
+    var monsters = [];
+       for(var k = 0; k < 10; k++){
+        var tempnum = Math.floor(Math.random() * (array1.length));
+        monsters.push(new Monster(tempnum));
+    }
+     //array with all the monsters. each monster has color string, "defeated" boolean, x coordinate int 
     var friends = [];
     var speed = 5; //pixel per second movement of monsters
     //var colors = ["pink", "orange", "yellow", "green", "blue", "white", "black"]
@@ -94,44 +94,37 @@
         animation.y = 300;
         animation.currentFrame = 0;
         stage.addChild(animation);
-        console.log("before or after");
     }
 
     createjs.Ticker.addEventListener("tick", handleTick);
     createjs.Ticker.setFPS(8);
 
+
     function handleTick(event) {
-        // Actions carried out each tick (aka frame)
-        ticks += 1;
-        for (i = 0; i < monsters.length; i++) {
-            if (!monsters[i].defeated) {
-                if (monsters[i].x <= 200 && !monsters[i].defeated) {
-                    monsterwarning(i);
-                    nextmonster = true;
-                }
-                monsters[i].x -= speed;
-
-                monsters[i].sprite.x = monsters[i].x
-                stage.addChild(monsters[i].sprite);
-            }
+        if(monsters.length > 0){
+            var currentMonster = monsters[0];
+        if (monsters[0].sprite.x <= -200) {
+            monsterpassing(0);
         }
+        monsters[0].sprite.x -= speed;
+        stage.addChild(monsters[0].sprite);
         stage.update();
-        if (!event.paused) {
-            // Actions carried out when the Ticker is not paused.
         }
-    }
-    //called when monsters reach a certain point 
-    function monsterwarning(i) {
-        monsters[i].defeated = true;
-        monsters[i].color = "#FF0000";
-        console.log("lost a life");
-        monsters[i].sprite.gotoAndPlay("still");
-        annyang.abort();
-        //        annyang.start();
+        
     }
 
-    function newmonster(index) {
-        var data = {
+    function monsterpassing(i) {
+
+        console.log("MONSTER PASSING");
+        monsters[0].sprite.x = 1100;
+        monsters.push(monsters.splice(0,1)[0]);
+        console.log(monsters);
+        resetAnnyang();
+        nextmonster();
+    }
+
+    function Monster(index){
+        this.data = {
             images: [colors[index] + "spritesheet.png"],
             frames: { width: 400, height: 400 },
             animations: {
@@ -139,68 +132,24 @@
                 still: [8]
             }
         };
-        var monster = { color: colors[index], x: 1000, defeated: false, sprite: null }
-        var spriteSheet = new createjs.SpriteSheet(data);
-        monster.sprite = new createjs.Sprite(spriteSheet);
-        monster.sprite.gotoAndPlay("run");
-        monster.sprite.x = monster.x;
-        monster.sprite.currentFrame = ticks % 8;
-        monster.sprite.scaleX = .75;
-        monster.sprite.scaleY = .75;
-        monster.sprite.y = 300;
-        stage.addChild(monster.sprite);
-        stage.update();
-        monsters.push(monster);
+        this.index = index; 
+        this.color = colors[index];
+        var spriteSheet = new createjs.SpriteSheet(this.data);
+        this.sprite = new createjs.Sprite(spriteSheet);
+        this.sprite.gotoAndPlay("run");
+        // this.sprite.currentFrame = ticks % 8;
+        this.sprite.scaleX = .75;
+        this.sprite.scaleY = .75;
+        this.sprite.x = 1000;
+        this.sprite.y = 300;
     }
 
-    function getRandomColor() {
-        return colors[Math.floor(Math.random() * 8)];
-    }
-
-    function resetAnnyang() {
-        annyang.abort();
-        annyang.start();
-    }
-
-    function defeatmonster() {
-        var i = 0;
-        while (i < monsters.length && monsters[i].defeated) {
-            i++;
-        }
-        if (i < monsters.length) {
-            monsters[i].defeated = true;
-            if (collected >= 10) {
-                //shifts top collection bar left if it gets full 
-                var j = 0;
-                while (j < monsters.length && monsters[j].defeated) {
-                    monsters[j].sprite.x -= 100;
-                    j++;
-                }
-                monsters[i].sprite.x = 900
-            } else
-                monsters[i].sprite.x = 100 * collected;
-            monsters[i].sprite.scaleX = .25;
-            monsters[i].sprite.scaleY = .25;
-            collected += 1;
-            monsters[i].sprite.y = 0;
-            stage.addChild(monsters[i].sprite);
-            stage.update();
-            annyang.abort();
-        }
-    }
-    annyang.addCommands(commands);
-    //$("#switch").click(function(){
-    //     console.log("ive been clicked");
-    number_of_rounds = 0;
-    while (nextmonster == true) {
-        nextmonster = false;
+    function nextmonster(){
         annyang.removeCommands();
-        var temp = Math.floor(Math.random() * (array1.length));
-        console.log(array1[temp]);
-        newmonster(temp);
-        annyang.abort();
-        annyang.addCommands(array1[temp]);
-        speak('What color am I?', voices[temp]);
+        
+        console.log(monsters[0].index, array1[monsters[0].index]);
+        annyang.addCommands(array1[monsters[0].index]);
+        speak('What color am I?', voices[monsters[0].index]);
         //        var msg = new SpeechSynthesisUtterance();
         //          var voices = window.speechSynthesis.getVoices();
         //          msg.voice = voices[10]; // Note: some voices don't support altering params
@@ -211,14 +160,45 @@
         //          msg.text = 'What color am I?';
         //          msg.lang = 'en-US';
         //        window.speechSynthesis.speak(msg);
+        annyang.abort();
         annyang.start();
-        if (number_of_rounds >= 10) {
-            nextmonster = false;
-        }
         speed++;
-        number_of_rounds++;
+        stage.addChild(monsters[0].sprite);
+        stage.update();
     }
-    //  });
+
+    function resetAnnyang() {
+        annyang.abort();
+        annyang.start();
+    }
+
+    function defeatmonster() {
+        if (monsters.length>0) {
+            if (friends.length >= 10) {
+                //shifts top collection bar left if it gets full 
+                var j = 0;
+                while (j < friends.length) {
+                    friends[j].sprite.x -= 100;
+                    j++;
+                }
+                friends.push(monsters.splice(0,1)[0]);
+                friends[friends.length - 1].sprite.x = 900;
+            } else{
+                friends.push(monsters.splice(0,1)[0]);
+                friends[friends.length - 1].sprite.x  = 100 * friends.length;
+            } 
+            friends[friends.length - 1].sprite.scaleX = .25;
+            friends[friends.length - 1].sprite.scaleY = .25;
+            friends[friends.length - 1].sprite.y = 0;
+            stage.addChild(friends[friends.length - 1].sprite);
+            stage.update();
+        }
+        nextmonster();
+        resetAnnyang();
+    }
+
+    nextmonster(monsters[0]);
+    annyang.addCommands(commands);
     </script>
 </body>
 
