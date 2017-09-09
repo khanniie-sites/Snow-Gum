@@ -8,9 +8,11 @@
     <meta name="description" content="The HTML5 Herald">
     <meta name="author" content="SitePoint">
     <link rel="stylesheet" href="main.css"> 
+    <link href="https://fonts.googleapis.com/css?family=Life+Savers" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
     <script src="commandList.js"></script>
+    <script src="https://code.createjs.com/tweenjs-0.6.2.min.js"></script>
     <script src="https://code.createjs.com/easeljs-0.8.2.min.js"></script>
     <script src="speakClient.js"></script>
 </head>
@@ -19,7 +21,7 @@
     <div id="centered">
     <img src="logo.png"><br>
     <canvas id="demoCanvas" width="1100" height="700"></canvas>
-    <div id="name">hey</div>
+        <div id="name">en español</div>
     </div>
     <button type="button" onclick="defeatmonster()">defeat monster</button>
 <!--
@@ -43,7 +45,6 @@
             console.log(commandText);
             console.log(phrases);
             defeatmonster();
-            $("#name").html("Defeated!");
             resetAnnyang();
         });
 
@@ -214,8 +215,8 @@
 //                    friends[j].sprite.x -= 100;
 //                    j++;
                 //}
+                $("#name").html("You Won!");
                 Ticker.setPaused(true); 
-                document.getElementById("name").innerHTML = "YOU WON!!!";
                 friends.push(monsters.splice(0,1)[0]);
                 friends[friends.length - 1].sprite.x = 900;
             } else{
@@ -225,6 +226,9 @@
             friends[friends.length - 1].sprite.scaleX = .25;
             friends[friends.length - 1].sprite.scaleY = .25;
             friends[friends.length - 1].sprite.y = 0;
+            $("#name").html(friends[friends.length-1].color + ", correct!");
+            if(friends.length == 10)
+                $("#name").html("You Won!");
             stage.addChild(friends[friends.length - 1].sprite);
             stage.update();
         }
