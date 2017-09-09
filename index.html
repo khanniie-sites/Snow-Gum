@@ -15,23 +15,30 @@
 <!--    <script src="canvasscript.js"></script>-->
     <script src="commandList.js"></script>
     <script src="https://code.createjs.com/easeljs-0.8.2.min.js"></script>
+    <script src="speakClient.js"></script>-->
 
 </head>
 
 <body onload="init();">
     <canvas id="demoCanvas" width="1100" height="700" style="border: 1px solid black; "></canvas>
     hello!!! 
+    
     <button type="button" onclick="defeatmonster()">defeat monster</button>
     <script src="hackcmu.js"></script>
     <div id="name"></div>
+    <button id="talk">Talk</button>
+    <div id="audio"></div>
     <button id="switch">SWITCH</button>
     
       <script>
+          
+
+
   if (annyang) {
     // Let's define our first command. First the text we expect, and then the function it should call
     annyang.start();
     var array1 = [pink, orange, yellow, green, blue, white, black];
-      
+    var voices = [{ amplitude: 200, wordgap: 1, pitch: 1000, speed: 175 }, { amplitude: 200, wordgap: 2, pitch: 40, speed: 200 }, { amplitude: 200, wordgap: 2, pitch: 500, speed: 100 }, { amplitude: 200, wordgap: 4, pitch: 100, speed: 75 }, { amplitude: 50, wordgap: 3, pitch: 350, speed: 250 }, { amplitude: 200, wordgap: 2, pitch: 15, speed: 125 }, { amplitude: 200, wordgap: 2, pitch: 650, speed: 250 }];  
     // Add our commands to annyang
     annyang.addCommands(commands);
     $("#switch").click(function(){
@@ -40,9 +47,30 @@
          var temp = Math.floor(Math.random()*(array1.length));
          console.log(array1[temp]);
          newmonster(temp);
-         annyang.addCommands(array1[temp]);
+         annyang.abort();
+        annyang.addCommands(array1[temp]);
+         speak('What color am I?', voices[temp]);
+//        var msg = new SpeechSynthesisUtterance();
+//          var voices = window.speechSynthesis.getVoices();
+//          msg.voice = voices[10]; // Note: some voices don't support altering params
+//          msg.voiceURI = 'native';
+//          msg.volume = 1; // 0 to 1
+//          msg.rate = 1; // 0.1 to 10
+//          msg.pitch = 2; //0 to 2
+//          msg.text = 'What color am I?';
+//          msg.lang = 'en-US';
+//        window.speechSynthesis.speak(msg);
          annyang.start();
-      });  
+      }); 
+    $("#talk").click(function(){
+        console.log("hi");
+            var x = 0;
+            while(x<voices.length)
+              {
+                  console.log(voices[x].name);
+                  x++;
+              }
+    });
     annyang.addCallback('resultMatch', function(userSaid, commandText, phrases) {
       console.log(userSaid); // sample output: 'hello'
       console.log(commandText); // sample output: 'hello (there)'
@@ -55,6 +83,7 @@
     annyang.addCallback('resultNoMatch', function(phrases) {
       console.log("I think the user said: ", phrases[0]);
       console.log("But then again, it could be any of the following: ", phrases);
+        annyang.abort();
         annyang.start();
     });
 
