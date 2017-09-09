@@ -1,0 +1,57 @@
+<!doctype html>
+
+<html lang="es-US">
+<head>
+  <meta charset="utf-8">
+
+  <title>The HTML5 Herald</title>
+  <meta name="description" content="The HTML5 Herald">
+  <meta name="author" content="SitePoint">
+  
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+  integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g="
+  crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
+
+  <script src="commandList.js"></script>
+</head>
+
+<body>
+  <script src="hackcmu.js"></script>
+  <div id="name"></div>
+    <button id="switch">SWITCH</button>
+    
+      <script>
+  if (annyang) {
+    // Let's define our first command. First the text we expect, and then the function it should call
+    
+    var array1 = [red, blue, white, yellow, green, orange, pink];
+      
+    // Add our commands to annyang
+    annyang.addCommands(commands);
+    $("#switch").click(function(){
+         console.log("ive been clicked");
+         annyang.removeCommands();
+         var temp = Math.floor(Math.random()*(array1.length));
+         console.log(array1[temp]);
+         annyang.addCommands(array1[temp]);
+         annyang.start();
+      });  
+    annyang.addCallback('resultMatch', function(userSaid, commandText, phrases) {
+      console.log(userSaid); // sample output: 'hello'
+      console.log(commandText); // sample output: 'hello (there)'
+      console.log(phrases); // sample output: ['hello', 'halo', 'yellow', 'polo', 'hello kitty']
+    });
+
+    annyang.addCallback('resultNoMatch', function(phrases) {
+      console.log("I think the user said: ", phrases[0]);
+      console.log("But then again, it could be any of the following: ", phrases);
+    });
+
+    // Start listening. You can call this here, or attach this call to an event, button, etc.
+    annyang.start();
+  }
+      
+  </script>
+</body>
+</html>
