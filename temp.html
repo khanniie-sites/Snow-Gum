@@ -3,24 +3,31 @@
 
 <head>
     <meta charset="utf-8">
-    <title>:::::::::::^) </title>
+    <link rel="shortcut icon" type="image/png" href="favicon.png"/>
+    <title>Snow Gum </title>
     <meta name="description" content="The HTML5 Herald">
     <meta name="author" content="SitePoint">
+    <link rel="stylesheet" href="main.css"> 
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
     <script src="commandList.js"></script>
     <script src="https://code.createjs.com/easeljs-0.8.2.min.js"></script>
-    <script src="speakClient.js"></script>-->
+    <script src="speakClient.js"></script>
 </head>
 
 <body>
-    <canvas id="demoCanvas" width="1100" height="700" style="border: 1px solid black; "></canvas>
-    hello!!!
+    <div id="centered">
+    <img src="logo.png"><br>
+    <canvas id="demoCanvas" width="1100" height="700"></canvas>
+    <div id="name">hey</div>
+    </div>
     <button type="button" onclick="defeatmonster()">defeat monster</button>
-    <div id="name"></div>
+<!--
     <button id="talk">Talk</button>
-    <div id="audio"></div>
     <button id="switch">SWITCH</button>
+-->
+    <div id="audio"></div>
+
     <script>
 
     //variables
@@ -81,7 +88,8 @@
         };
 
     var clouds = new createjs.Sprite(new createjs.SpriteSheet(clouddata)); 
-    var grass = new createjs.Sprite(new createjs.SpriteSheet(grassdata)); 
+    var grass = new createjs.Sprite(new createjs.SpriteSheet(grassdata));   
+    var maincharacter; 
     clouds.x = 0; 
     clouds.y = 0;
     grass.x = 0; 
@@ -107,8 +115,9 @@
         var animation = new createjs.Sprite(spriteSheet);
         animation.x = 100;
         animation.gotoAndPlay("run");
-        animation.y = 300;
+        animation.y = 320;
         animation.currentFrame = 0;
+        maincharacter = animation; 
         stage.addChild(animation);
     }
 
@@ -130,7 +139,6 @@
         grass.x -= speed; 
         if(grass.x <= -3300){
             grass.x += 2200; 
-            console.log("ur ass is grass");
         }
         stage.update();
         }
@@ -188,6 +196,7 @@
         annyang.start();
         speed++;
         stage.addChild(monsters[0].sprite);
+        stage.setChildIndex( maincharacter, stage.getNumChildren()-1);
         stage.update();
     }
 
@@ -200,11 +209,13 @@
         if (monsters.length>0) {
             if (friends.length >= 10) {
                 //shifts top collection bar left if it gets full 
-                var j = 0;
-                while (j < friends.length) {
-                    friends[j].sprite.x -= 100;
-                    j++;
-                }
+//                var j = 0;
+//                while (j < friends.length) {
+//                    friends[j].sprite.x -= 100;
+//                    j++;
+                //}
+                Ticker.setPaused(true); 
+                document.getElementById("name").innerHTML = "YOU WON!!!";
                 friends.push(monsters.splice(0,1)[0]);
                 friends[friends.length - 1].sprite.x = 900;
             } else{
